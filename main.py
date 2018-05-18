@@ -58,14 +58,18 @@ def layers(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes):
     #1x1 convolutions on layer 3, 4 and 7
     
     conv_1x1x3 = tf.layers.conv2d(vgg_layer3_out, num_classes, 1, padding='same',
+                                    kernel_initializer= tf.random_normal_initializer(stddev=0.01), 
                                     kernel_regularizer=reg1x3)
     conv_1x1x4 = tf.layers.conv2d(vgg_layer4_out, num_classes, 1, padding='same',
-                                    kernel_regularizer=reg1x3)
+                                   kernel_initializer= tf.random_normal_initializer(stddev=0.01),   
+                                   kernel_regularizer=reg1x3)
     conv_1x1x7 = tf.layers.conv2d(vgg_layer7_out, num_classes, 1, padding='same',
-                                    kernel_regularizer=reg1x3)
+                                     kernel_initializer= tf.random_normal_initializer(stddev=0.01), 
+                                     kernel_regularizer=reg1x3)
 
     # Do our first transposed convolution from layer 7
     deconv_1 = tf.layers.conv2d_transpose(conv_1x1x7, num_classes, 4, 2, padding='same',
+                                           kernel_initializer= tf.random_normal_initializer(stddev=0.01), 
                                            kernel_regularizer=reg1x3)
 
     # Add the first skip connection from layer 4
@@ -73,6 +77,7 @@ def layers(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes):
 
     # Do our second transposed convolution on that result
     deconv_2 = tf.layers.conv2d_transpose(skip_1, num_classes, 4, 2, padding='same',
+                                           kernel_initializer= tf.random_normal_initializer(stddev=0.01), 
                                            kernel_regularizer=reg1x3)
 
     # Add the second skip connection from layer 3
@@ -80,6 +85,7 @@ def layers(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes):
 
     # Do our third and last transposed convolution to match input image size
     deconv_3 = tf.layers.conv2d_transpose(skip_2, num_classes, 16, 8, padding='same',
+                                           kernel_initializer= tf.random_normal_initializer(stddev=0.01), 
                                            kernel_regularizer=reg1x3)
     return deconv_3
 tests.test_layers(layers)
@@ -149,7 +155,7 @@ def run():
 
     with tf.Session() as sess:
         batch_size = 2
-        epochs = 30
+        epochs = 10
         learning_rate = tf.constant(1e-4)
         # Path to vgg model
         vgg_path = os.path.join(data_dir, 'vgg')
