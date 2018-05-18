@@ -148,8 +148,8 @@ def run():
     #  https://www.cityscapes-dataset.com/
 
     with tf.Session() as sess:
-        batch_size = 1
-        epochs = 3
+        batch_size = 2
+        epochs = 30
         learning_rate = tf.constant(1e-4)
         # Path to vgg model
         vgg_path = os.path.join(data_dir, 'vgg')
