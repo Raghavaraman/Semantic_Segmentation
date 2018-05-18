@@ -149,7 +149,7 @@ def run():
 
     with tf.Session() as sess:
         batch_size = 1
-        epochs = 10
+        epochs = 3
         learning_rate = tf.constant(1e-4)
         # Path to vgg model
         vgg_path = os.path.join(data_dir, 'vgg')
@@ -162,11 +162,8 @@ def run():
         # TODO: Build NN using load_vgg, layers, and optimize function
         int_img, keep, lay3, lay4, lay7 = load_vgg(sess ,vgg_path)
         decon_out = layers(lay3, lay4, lay7, num_classes)
-        print("Net Ready")
         correct_label = tf.placeholder(tf.float32, [None, image_shape[0], image_shape[1], num_classes])
-        print("optimizer")
         logits, training_optimizer, cross_entropy_loss = optimize(decon_out, correct_label, learning_rate, num_classes)
-        print(tf.summary())
         # TODO: Train NN using the train_nn function
         train_nn(sess, epochs, batch_size, get_batches_fn, training_optimizer, cross_entropy_loss, int_img,
              correct_label, keep, learning_rate)
