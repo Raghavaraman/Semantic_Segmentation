@@ -32,8 +32,11 @@ def load_vgg(sess, vgg_path):
     vgg_layer3_out_tensor_name = 'layer3_out:0'
     vgg_layer4_out_tensor_name = 'layer4_out:0'
     vgg_layer7_out_tensor_name = 'layer7_out:0'
+    # To load the model of VGG
     tf.saved_model.loader.load(sess,[vgg_tag],vgg_path)
     graph = tf.get_default_graph()
+
+    # to get the various layers
     w1 = graph.get_tensor_by_name(vgg_input_tensor_name)
     keep = graph.get_tensor_by_name(vgg_keep_prob_tensor_name)
     w3 = graph.get_tensor_by_name(vgg_layer3_out_tensor_name)
@@ -67,23 +70,23 @@ def layers(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes):
                                      kernel_initializer= tf.random_normal_initializer(stddev=0.01), 
                                      kernel_regularizer=reg1x3)
 
-    # Do our first transposed convolution from layer 7
+    # transposed convolution from layer 7
     deconv_1 = tf.layers.conv2d_transpose(conv_1x1x7, num_classes, 4, 2, padding='same',
                                            kernel_initializer= tf.random_normal_initializer(stddev=0.01), 
                                            kernel_regularizer=reg1x3)
 
-    # Add the first skip connection from layer 4
+    # skip for layer7 and convolution of 4
     skip_1 = tf.add(deconv_1, conv_1x1x4)
 
-    # Do our second transposed convolution on that result
+    # next transposed convolution 
     deconv_2 = tf.layers.conv2d_transpose(skip_1, num_classes, 4, 2, padding='same',
                                            kernel_initializer= tf.random_normal_initializer(stddev=0.01), 
                                            kernel_regularizer=reg1x3)
 
-    # Add the second skip connection from layer 3
+    # skip for layers devconv_2 and con 1*1 of  layer 3
     skip_2 = tf.add(deconv_2, conv_1x1x3)
 
-    # Do our third and last transposed convolution to match input image size
+    # transposed convolution to match input image size
     deconv_3 = tf.layers.conv2d_transpose(skip_2, num_classes, 16, 8, padding='same',
                                            kernel_initializer= tf.random_normal_initializer(stddev=0.01), 
                                            kernel_regularizer=reg1x3)
@@ -101,8 +104,11 @@ def optimize(nn_last_layer, correct_label, learning_rate, num_classes):
     :return: Tuple of (logits, train_op, cross_entropy_loss)
     """
     # TODO: Implement function
+    #appropiate logits and labels
     logits = tf.reshape(nn_last_layer, (-1, num_classes))
     labels = tf.reshape(correct_label, (-1, num_classes))
+
+    #calculate cross entropy loss and use adam optimizer
     cross_entropy_loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits= logits, labels= labels))
     training_optimizer = tf.train.AdamOptimizer(learning_rate).minimize(cross_entropy_loss)
     return logits, training_optimizer, cross_entropy_loss
